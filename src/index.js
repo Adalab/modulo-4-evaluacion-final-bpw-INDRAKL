@@ -45,6 +45,8 @@ server.listen(port, () => {
 
 // DEFINIR ENDPOINTS
 
+//OBTENER TODAS LAS RECETAS
+
 server.get("/api/recetas", async (req, res) => {
   const connection = await getConnection();
   const [rows] = await connection.query("SELECT * FROM recetas");
@@ -57,6 +59,8 @@ server.get("/api/recetas", async (req, res) => {
   res.json(response);
 });
 
+//OBTENER UNA RECETA POR SU ID
+
 server.get("/api/recetas/:id", async (req, res) => {
   const conn = await getConnection();
   const selectRecipe = "SELECT * FROM recetas WHERE id = ?";
@@ -65,6 +69,47 @@ server.get("/api/recetas/:id", async (req, res) => {
   const data = results[0];
   res.json(data);
 });
+
+//CREAR UNA NUEVA RECETA
+
+const createErrorResponse = (message) => {
+  return {
+    success: false,
+    error: message,
+  };
+};
+
+server.post("/api/recetas", async (req, res) => {
+  try {
+    if (!req.body.nombre || req.body.nombre === "") {
+      res
+        .status(400)
+        .json(createErrorResponse("Todos los campos son obligatorios"));
+      return;
+    }
+    const conn = await getConnection();
+    const insertRecipe = `
+          INSERT INTO receta (nombre, ingredientes, instrucciones) VALUES (?, ?, ?);
+        `;
+    const [insertResult] = await conn.execute(insertRecipe, [
+      req.body.nombre,
+      req.body.ingredientes,
+      req.body.instrucciones,
+    ]);
+    conn.end();
+    res.json({
+      success: true,
+      id: insertResult.insertId,
+    });
+  } catch (error) {
+    res.json({
+      success: false,
+      error: "La receta no ha podido añadirse a nuestra base de datos",
+    });
+  }
+});
+
+//ACTUALIZAR UNA RECETA EXISTENTE
 
 server.put("/api/recetas/:id", async (req, res) => {
   try {
@@ -93,10 +138,26 @@ server.put("/api/recetas/:id", async (req, res) => {
   }
 });
 
-// // DEFINIR SERVIDORES ESTÁTICOS
+//ELIMINAR UNA RECETA
 
-// const staticServerPathWeb = "./public"; // En esta carpeta (partiendo de la raíz del proyecto) ponemos los ficheros estáticos
-// server.use(express.static(staticServerPathWeb));
+server.delete("/api/recetas/:id", async (req, res) => {
+  try {
+    const conn = await getConnection();
+    const deleteRecipe = `
+          DELETE FROM recetas WHERE id = ?
+        `;
+    const [deleteResult] = await conn.execute(deleteRecipe, [req.params.id]);
+    conn.end();
+    res.json({
+      success: true,
+    });
+  } catch (error) {
+    res.json({
+      success: false,
+      error: "La receta no ha podido eliminarse con éxito",
+    });
+  }
+});
 
 // DEFINIR PÁGINA 404
 
