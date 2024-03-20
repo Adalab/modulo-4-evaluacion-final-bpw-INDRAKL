@@ -66,28 +66,37 @@ server.get("/api/recetas/:id", async (req, res) => {
   res.json(data);
 });
 
-server.post("/api/recetas", async (req, res) => {
-  const conn = await getConnection();
-  const insertRecipe = `
-INSERT INTO receta (nombre, ingredientes, instrucciones)
-VALUES (?, ?, ?)`;
-  const [resultsInsertRecipe] = await conn.execute(insertRecipe, [
-    req.body.nombre,
-    req.body.ingredientes,
-    req.body.instrucciones,
-  ]);
-  const nuevo_id = resultsInsertRecipe.insertId;
-  conn.end();
-  res.json({
-    success: true,
-    id: nuevo_id,
-  });
+server.put("/api/recetas/:id", async (req, res) => {
+  try {
+    const conn = await getConnection();
+    const updateRecipe = `
+      UPDATE recetas
+      SET nombre = ?, ingredientes = ?, instrucciones = ?
+      WHERE id = ?
+    `;
+
+    const [updateResult] = await conn.execute(updateRecipe, [
+      req.body.nombre,
+      req.body.ingredientes,
+      req.body.instrucciones,
+      req.params.id,
+    ]);
+    conn.end();
+    res.json({
+      success: true,
+    });
+  } catch (error) {
+    res.json({
+      success: false,
+      error: "La receta no ha podido actualizarse",
+    });
+  }
 });
 
-// DEFINIR SERVIDORES ESTÁTICOS
+// // DEFINIR SERVIDORES ESTÁTICOS
 
-const staticServerPathWeb = "./public"; // En esta carpeta (partiendo de la raíz del proyecto) ponemos los ficheros estáticos
-server.use(express.static(staticServerPathWeb));
+// const staticServerPathWeb = "./public"; // En esta carpeta (partiendo de la raíz del proyecto) ponemos los ficheros estáticos
+// server.use(express.static(staticServerPathWeb));
 
 // DEFINIR PÁGINA 404
 
