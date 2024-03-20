@@ -93,7 +93,7 @@ const createErrorResponse = (message) => {
 
 server.post("/api/recetas", async (req, res) => {
   try {
-    if (!req.body.nombre || req.body.nombre === "") {
+    if (!req.body.nombre || !req.body.ingredientes || !req.body.instrucciones) {
       res
         .status(400)
         .json(createErrorResponse("Todos los campos son obligatorios"));
@@ -141,6 +141,7 @@ server.put("/api/recetas/:id", async (req, res) => {
     conn.end();
     res.json({
       success: true,
+      message: "Tu receta ha sido actualizada con éxito",
     });
   } catch (error) {
     res.json({
@@ -156,12 +157,13 @@ server.delete("/api/recetas/:id", async (req, res) => {
   try {
     const conn = await getConnection();
     const deleteRecipe = `
-          DELETE FROM recetas WHERE id = ?
-        `;
+            DELETE FROM recetas WHERE id = ?
+          `;
     const [deleteResult] = await conn.execute(deleteRecipe, [req.params.id]);
     conn.end();
     res.json({
       success: true,
+      message: "La receta ha sido eliminada con éxito",
     });
   } catch (error) {
     res.json({
