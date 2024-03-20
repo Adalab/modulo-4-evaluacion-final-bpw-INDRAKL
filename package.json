@@ -1,0 +1,31 @@
+{
+  "name": "recetas",
+  "version": "1.0.0",
+  "description": "El proyecto de Recetas es una aplicación basada que permite a las usuarias buscar, ver y guardar recetas de cocina. Podrán uscar recetas por nombre o ingredientes, ver los detalles de una receta, agregar recetas a sus favoritos y también agregar sus propias recetas.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/index.js",
+    "dev": "npx nodemon src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Adalab/modulo-4-evaluacion-final-bpw-INDRAKL.git"
+  },
+  "keywords": [
+    "recetas",
+    "ingredientes",
+    "cocina",
+    "foodie",
+    "comida"
+  ],
+  "author": "@indrakl",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Adalab/modulo-4-evaluacion-final-bpw-INDRAKL/issues"
+  },
+  "homepage": "https://github.com/Adalab/modulo-4-evaluacion-final-bpw-INDRAKL#readme",
+  "dependencies": {
+    "dotenv": "^16.4.5"
+  }
+}
