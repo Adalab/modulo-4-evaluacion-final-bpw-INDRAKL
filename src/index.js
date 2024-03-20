@@ -62,12 +62,24 @@ server.get("/api/recetas", async (req, res) => {
 //OBTENER UNA RECETA POR SU ID
 
 server.get("/api/recetas/:id", async (req, res) => {
-  const conn = await getConnection();
-  const selectRecipe = "SELECT * FROM recetas WHERE id = ?";
-  const [results] = await conn.query(selectRecipe, [req.params.id]);
-  conn.end();
-  const data = results[0];
-  res.json(data);
+  try {
+    const conn = await getConnection();
+    const selectRecipe = "SELECT * FROM recetas WHERE id = ?";
+    const [results] = await conn.query(selectRecipe, [req.params.id]);
+    conn.end();
+
+    if (results.length === 0) {
+      res
+        .status(404)
+        .json({ error: "La receta que buscas no ha sido encontrada." });
+      return;
+    }
+
+    res.json(results[0]);
+  } catch (error) {
+    console.error("Error al buscar la receta:", error.message);
+    res.status(500).json({ error: "Hubo un error al buscar la receta." });
+  }
 });
 
 //CREAR UNA NUEVA RECETA
