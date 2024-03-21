@@ -124,30 +124,42 @@ server.post("/api/recetas", async (req, res) => {
 //ACTUALIZAR UNA RECETA EXISTENTE
 
 server.put("/api/recetas/:id", async (req, res) => {
+  const connection = await getConnection();
   try {
-    const conn = await getConnection();
     const updateRecipe = `
       UPDATE recetas
       SET nombre = ?, ingredientes = ?, instrucciones = ?
       WHERE id = ?
     `;
 
-    const [updateResult] = await conn.execute(updateRecipe, [
+    const [updateResult] = await connection.execute(updateRecipe, [
       req.body.nombre,
       req.body.ingredientes,
       req.body.instrucciones,
       req.params.id,
     ]);
-    conn.end();
+
+    if (updateResult.affectedRows === 0) {
+      res.status(404).json({
+        success: false,
+        error:
+          "La receta no ha sido encontrada o no se ha actualizado correctamente.",
+      });
+      return;
+    }
+
     res.json({
       success: true,
-      message: "Tu receta ha sido actualizada con éxito",
+      message: "La receta ha sido actualizada con éxito",
     });
   } catch (error) {
-    res.json({
+    console.error("Error al actualizar la receta:", error.message);
+    res.status(500).json({
       success: false,
-      error: "La receta no ha podido actualizarse",
+      error: "Hubo un error al actualizar la receta.",
     });
+  } finally {
+    connection.end();
   }
 });
 
@@ -157,16 +169,23 @@ server.delete("/api/recetas/:id", async (req, res) => {
   try {
     const conn = await getConnection();
     const deleteRecipe = `
-            DELETE FROM recetas WHERE id = ?
-          `;
+      DELETE FROM recetas WHERE id = ?
+    `;
     const [deleteResult] = await conn.execute(deleteRecipe, [req.params.id]);
     conn.end();
+    if (deleteResult.affectedRows === 0) {
+      res
+        .status(404)
+        .json({ success: false, error: "La receta no ha sido encontrada." });
+      return;
+    }
     res.json({
       success: true,
       message: "La receta ha sido eliminada con éxito",
     });
   } catch (error) {
-    res.json({
+    console.error("Error al eliminar la receta:", error.message);
+    res.status(500).json({
       success: false,
       error: "La receta no ha podido eliminarse con éxito",
     });
