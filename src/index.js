@@ -84,24 +84,18 @@ server.get("/api/recetas/:id", async (req, res) => {
 
 //CREAR UNA NUEVA RECETA
 
-const createErrorResponse = (message) => {
-  return {
-    success: false,
-    error: message,
-  };
-};
-
 server.post("/api/recetas", async (req, res) => {
   try {
     if (!req.body.nombre || !req.body.ingredientes || !req.body.instrucciones) {
-      res
-        .status(400)
-        .json(createErrorResponse("Todos los campos son obligatorios"));
+      res.status(400).json({
+        success: false,
+        message: "Todos los campos son obligatorios",
+      });
       return;
     }
     const conn = await getConnection();
     const insertRecipe = `
-          INSERT INTO receta (nombre, ingredientes, instrucciones) VALUES (?, ?, ?);
+          INSERT INTO recetas (nombre, ingredientes, instrucciones) VALUES (?, ?, ?);
         `;
     const [insertResult] = await conn.execute(insertRecipe, [
       req.body.nombre,
@@ -112,6 +106,7 @@ server.post("/api/recetas", async (req, res) => {
     res.json({
       success: true,
       id: insertResult.insertId,
+      message: "La nueva receta ha sido añadida con éxito",
     });
   } catch (error) {
     res.json({
