@@ -21,10 +21,8 @@ Esta API permite:
 
 ## FEEDBACK Y CONTRIBUCIÓN
 
-¡Gracias por explorar esta api! Si encuentras problemas o tienes sugerencias de mejora no dudes en:
+¡Gracias por explorar esta API! Si encuentras problemas o tienes sugerencias de mejora no dudes en:
 
 - Abrir un Issue en este repositorio.
 - Enviarme un mensaje a [indrakislo@gmail.com].
 - Tu participación es bienvenida.
-
-@INDRAKL
